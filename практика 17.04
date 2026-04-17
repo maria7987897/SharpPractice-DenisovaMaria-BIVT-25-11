@@ -1,1 +1,56 @@
+using System.Diagnostics.Tracing;
+using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
+using System.Linq;
+using System.Security.Cryptography; // Добавить
 
+namespace ConsoleApp34
+{
+    internal class Program
+    {
+        static void Main(string[] args)
+        {
+            // Sum, Count, Max/Min
+            int[] numbers = { 1, 2, 3, 4 };
+            int result = numbers.Sum(x => x % 2);
+
+            string[] words = { "hello", "my", "f" };
+            result = words.Min(x => x.Length);
+            int result2 = words.Count(x => x.Length % 2 == 0);
+
+            Example[] examples = new Example[3];
+            for (int i = 0; i < 3; i++)
+            {
+                examples[i] = new Example(i);
+            }
+            result = examples.Sum(x => x.Num);
+
+            //Any, All
+            bool f1 = words.Any(x => x.Length % 3 == 0);
+            bool f2 = words.All(x => x.Length > 1);
+            Console.WriteLine(f1);
+            Console.WriteLine(f2);
+
+            //Select, Where, GroupBy, Distinct
+            int[] wordsLength = words.Select(x => x.Length).ToArray();
+            string[] longwords = words.Where(x => x.Length > 2).ToArray();
+            string[] trimmeWords = words.Select(x => x.Trim(' ')).ToArray();
+
+            int[] wordResult = words.Select(x => x.Length).Where(x => x > 2).ToArray();
+
+            string word = "hello123";
+            char[] wordChars = word.ToCharArray();
+            bool f = wordChars.Any(x => char.IsDigit(x));
+        } 
+
+        public struct Example
+        {
+            private int _num;
+            public int Num => _num;
+            public Example(int num)
+            {
+                _num = num; 
+            }
+        }
+    }
+}
