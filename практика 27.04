@@ -8,23 +8,23 @@ namespace ConsoleApp1
     {
         private string _name;
         private int _duration;
-        private int[] _rewiew;
+        private int[] _review;
 
         public string Name { get { return _name; } }
         public int Duration { get { return _duration; } }
-        public int[] Rexiew => _rewiew.ToArray();
+        public int[] Review => _review.ToArray();
 
         public Movie(string name, int duration)
         {
             _name = name;
             _duration = duration;
-            _rewiew = new int[0];
+            _review = new int[0];
         }
 
         public void Add(int num)
         {
-            Array.Resize(ref _rewiew, _rewiew.Length + 1);
-            _rewiew[_rewiew.Length - 1] = num;
+            Array.Resize(ref _review, _review.Length + 1);
+            _review[_review.Length - 1] = num;
         }
     }
 
@@ -32,32 +32,31 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            Movie movie1 = new Movie("Harry Poter", 102);
+            Movie movie1 = new Movie("Harry Potter", 102);
             movie1.Add(5);
             movie1.Add(4);
             movie1.Add(4);
 
             var temp = new
             {
-                MovieType = movie1.GetType().Name;
-                movie1.Name;
-                movie1.Duraction;
-                movie1.Rewiew;
-            }
+                MovieType = movie1.GetType().Name,
+                movie1.Name,
+                movie1.Duration,
+                movie1.Review
+            };
 
             string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string filePath = Path.Combine(folderPath, "Test", "example.json");
 
             //десереализация
             string content = File.ReadAllText(filePath);
-            var newJson = JsonConvert.DeserializeObject<dinamic>(content);
-            
-            Movie movie2 = new Movie(new)
-            
-            
+            var newJson = JsonConvert.DeserializeObject<dynamic>(content);
 
-        };
-
+            Movie movie2 = new Movie((string)newJson.Name, (int)newJson.Duration);
+            foreach (int n in newJson.Review)
+            {
+                movie2.Add(n);
+            }
 
             //////получение путей к папкам
 
@@ -130,6 +129,17 @@ namespace ConsoleApp1
             ////}
             ////File.Delete(filePath); //никаких потоков не возращ
         }
-        private bool Compare(Movie m1, 
+
+        private static bool CompareMovies(Movie m1, Movie m2)
+        {
+            if (m1.Name != m2.Name) return false;
+            if (m1.Duration != m2.Duration) return false;
+            if (m1.Review.Length != m2.Review.Length) return false;
+            for (int i = 0; i < m1.Review.Length; i++)
+            {
+                if (m1.Review[i] != m2.Review[i]) return false;
+            }
+            return true;
+        }
     }
 }
