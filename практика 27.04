@@ -1,6 +1,5 @@
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
 
 namespace ConsoleApp1
 {
@@ -9,9 +8,8 @@ namespace ConsoleApp1
         private string _name;
         private int _duration;
         private int[] _review;
-
-        public string Name { get { return _name; } }
-        public int Duration { get { return _duration; } }
+        public string Name => _name;
+        public int Duration => _duration;
         public int[] Review => _review.ToArray();
 
         public Movie(string name, int duration)
@@ -20,21 +18,19 @@ namespace ConsoleApp1
             _duration = duration;
             _review = new int[0];
         }
-
         public void Add(int num)
         {
             Array.Resize(ref _review, _review.Length + 1);
-            _review[_review.Length - 1] = num;
+            _review[_review.Length - 1] = num; 
         }
     }
-
     internal class Program
     {
         static void Main(string[] args)
         {
             Movie movie1 = new Movie("Harry Potter", 102);
             movie1.Add(5);
-            movie1.Add(4);
+            movie1.Add(5);
             movie1.Add(4);
 
             var temp = new
@@ -45,91 +41,72 @@ namespace ConsoleApp1
                 movie1.Review
             };
 
-            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
-            string filePath = Path.Combine(folderPath, "Test", "example.json");
+            Console.WriteLine(temp.Name);
 
-            //десереализация
-            string content = File.ReadAllText(filePath);
-            var newJson = JsonConvert.DeserializeObject<dynamic>(content);
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string jsonFilePath = Path.Combine(desktopPath, "Test", "example.json");
+
+            // сериализация
+            string json = JsonConvert.SerializeObject(temp);
+            File.WriteAllText(jsonFilePath, json);
+            
+            // десериализация
+            string jsContent = File.ReadAllText(jsonFilePath);
+            var newJson = JsonConvert.DeserializeObject<dynamic>(jsContent);
 
             Movie movie2 = new Movie((string)newJson.Name, (int)newJson.Duration);
             foreach (int n in newJson.Review)
             {
-                movie2.Add(n);
+                movie2.Add((int)n);
+            }
+            Console.WriteLine(CompareMovies(movie1, movie2));
+            
+
+            // Получение путей к папкам
+
+            // Абсолютный путь
+            //
+            // Относительный путь
+            // "dataset/data.txt"
+
+            string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string filePath = Path.Combine(folderPath, "example.txt");
+
+            string folderPath1 = Path.Combine(folderPath, "Test");
+            string filePath1 = Path.Combine(folderPath1, "example.txt");
+
+            string folderPath1Check = Path.GetDirectoryName(filePath1);
+            string fileNameCheck = Path.GetFileName(filePath1);
+            string fileExtCheck = Path.GetExtension(filePath1);
+
+            if (!Directory.Exists(folderPath1))
+            {
+                Directory.CreateDirectory(folderPath1);
             }
 
-            //////получение путей к папкам
+            if (!File.Exists(filePath))
+            {
+                File.Create(filePath).Close();
+                //FileStream fs = File.Create(filePath);
+                //fs.Close();
+            }
 
-            //////абсолютный путь - путь до файла на компе(полноценный путь)
-            //////
-            //////относительный путь(Relative path)
-            ////// "dataset/data.txt" - путь относительно того, где мы сейчас работаем(не ломаются)
+            File.WriteAllText(filePath1, "Hey!");
+            File.WriteAllLines(filePath1, new string[] { "So", "cold", "today" });
+            // Записывает файл в строку.
+            // Если файла не было - создает и записывает
+            // Если файл был - перезаписывает содержимое
 
-            //////string folderPath1 = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            ////string folderPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop); //путь до системных папок
-            ////string filePath = Path.Combine(folderPath, "Test", "example.txt"); //folderPath + "/" + "example.txt"
-
-            //////Console.WriteLine(folderPath);
-            ////Console.WriteLine(filePath);
-            //////проверять файл через Create, мб он уже создан
-
-
-
-            ////string folderPath1 = Path.Combine(folderPath, "Test");
-            ////string filePath1 = Path.Combine(folderPath1, "example.txt");
-
-            ////string folderPath1Check = Path.GetDirectoryName(filePath1);
-            ////string fileNameCheck = Path.GetFileName(filePath1);
-            ////string fileExtCheck = Path.GetExtension(filePath1);
-            //////Console.WriteLine(folderPath1Check); //путь до файла
-            //////Console.WriteLine(fileNameCheck);
-            //////Console.WriteLine(fileExtCheck); //расширение файла
-
-            ////if (!Directory.Exists(folderPath))
-            ////{
-            ////    //Console.WriteLine("есть папка");
-            ////    Directory.CreateDirectory(folderPath1);
-            ////}
-            //////else
-            //////{
-            //////    //Console.WriteLine("нет папки");
-            //////    Directory.CreateDirectory(folderPath1);
-            //////    //Console.WriteLine("создали");
-            //////}
-
-            ////if (!File.Exists(filePath))
-            ////{
-            ////    //Console.WriteLine("файл существует на компе");
-            ////    File.Create(filePath).Close();
-            ////}
-            ////else
-            ////{
-            ////    //Console.WriteLine("не существует указанного файла");
-            ////    //FileStream fs = File.Create(filePath);
-            ////    //fs.Close(); //поток, закрываем 
-            ////    File.Create(filePath).Close();
-            ////    //Console.WriteLine("файл создан");
-            ////}
-
-            ////File.WriteAllText(filePath, "hey!"); //записываем в файл строку и набор строк
-            //////если файла не было - создает + записывает
-            //////если файл был - перезаписывает содержимое (удаляет старое)
-            ////File.WriteAllLines(filePath, new string[] { "so", "cold", "today" });
-
-            ////File.WriteAllText(filePath, "");
-            ////File.AppendAllText(filePath, "woohoo"); //не переносит строку, если ему об этом не сказать!!, создаст файл, если нет
-            ////File.AppendAllLines(filePath, new string[] { " ", "no", "idea" });
+            File.WriteAllText(filePath1, "");
+            File.AppendAllText(filePath1, "Wohoo");
+            File.AppendAllLines(filePath1, new string[] { "No", "idea" });
 
 
-            ////string content = File.ReadAllText(filePath);
-            ////string[] lines = File.ReadAllLines(filePath);
-            ////foreach (string line in lines)
-            ////{
-            ////    Console.WriteLine(line);
-            ////}
-            ////File.Delete(filePath); //никаких потоков не возращ
+            string content = File.ReadAllText(filePath1);
+            string[] lines = File.ReadAllLines(filePath1);
+
+            File.Delete(filePath);
         }
-
         private static bool CompareMovies(Movie m1, Movie m2)
         {
             if (m1.Name != m2.Name) return false;
